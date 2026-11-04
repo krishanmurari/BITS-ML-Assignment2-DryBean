@@ -17,15 +17,18 @@ from sklearn.metrics import (
     classification_report
 )
 
+# Configure the Streamlit page metadata and overall app layout.
 st.set_page_config(
     page_title="Dry Bean Classifier",
     page_icon="🫘",
     layout="wide"
 )
 
+# App heading and course context for the assignment.
 st.title("🫘 Dry Bean Classification")
 st.write("BITS WILP M.Tech AIML - Assignment 2")
 
+# Mapping of model names to the saved joblib artifacts in the models directory.
 MODEL_FILES = {
     "Logistic Regression": "logistic_regression.joblib",
     "Decision Tree": "decision_tree.joblib",
@@ -34,16 +37,19 @@ MODEL_FILES = {
     "Support Vector Machine": "support_vector_machine.joblib"
 }
 
+# Load the expected feature order used during training so uploaded data matches the model inputs.
 with open("models/feature_names.json") as f:
     features = json.load(f)
 
 st.sidebar.header("Model Configuration")
 
+# Allow the user to choose which trained dry-bean classifier to evaluate.
 selected_model = st.sidebar.selectbox(
     "Select Classification Model",
     list(MODEL_FILES.keys())
 )
 
+# Upload a CSV file containing the same feature columns used during training.
 uploaded_file = st.file_uploader(
     "Upload Test Dataset (CSV)",
     type=["csv"]
@@ -55,14 +61,17 @@ if uploaded_file is None:
 
 data = pd.read_csv(uploaded_file)
 
+# Validate the uploaded dataset before inference so the app fails gracefully on schema issues.
 missing = [col for col in features if col not in data.columns]
 
 if missing:
     st.error(f"Missing required columns: {missing}")
     st.stop()
 
+# Restrict input to the feature columns expected by the selected trained classifier.
 X_input = data[features]
 
+# Load the chosen trained model from disk.
 model_path = os.path.join(
     "models",
     MODEL_FILES[selected_model]
@@ -70,10 +79,12 @@ model_path = os.path.join(
 
 model = joblib.load(model_path)
 
+# Generate predictions for the uploaded dataset.
 predictions = model.predict(X_input)
 
 st.subheader("Predictions")
 
+# Keep a copy of the original data and append model predictions for download and review.
 output = data.copy()
 output["Predicted_Class"] = predictions
 
@@ -88,9 +99,11 @@ st.download_button(
 
 if "Class" in data.columns:
 
+    # Real labels are required to compute supervised evaluation metrics.
     y_true = data["Class"]
     probabilities = model.predict_proba(X_input)
 
+    # Aggregate the key classification metrics for comparison and reporting.
     metrics = {
         "Accuracy": accuracy_score(y_true, predictions),
         "AUC": roc_auc_score(
@@ -127,6 +140,7 @@ if "Class" in data.columns:
 
     st.subheader("Confusion Matrix")
 
+    # Confusion matrix shows how often each class is confused with other bean types.
     cm = confusion_matrix(
         y_true,
         predictions,
@@ -152,6 +166,7 @@ if "Class" in data.columns:
 
     st.subheader("Classification Report")
 
+    # Print a class-wise summary with precision, recall, F1-score, and support.
     st.text(
         classification_report(
             y_true,
