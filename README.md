@@ -1,110 +1,112 @@
 # BITS-ML-Assignment2-DryBean
 
-This project implements a dry bean classification workflow for the BITS WILP M.Tech AIML assignment. It uses multiple machine learning classifiers to predict bean types from morphological features and includes a Streamlit web app for evaluating the trained models on uploaded CSV datasets.
+## 1. Problem statement
 
-## Project Overview
+This project addresses the classification of dry bean varieties using their geometric and morphological features. The objective is to train and compare several machine learning models to identify the most accurate classifier for bean type prediction based on numeric image-derived measurements.
 
-The task is based on the Dry Bean Dataset from the UCI Machine Learning Repository. The dataset contains geometric and shape-based features extracted from images of beans, and the target variable is the bean class.
+The problem is a supervised multi-class classification task where the model learns from 16 input features and predicts one of seven bean classes.
 
-The notebook trains and compares several classifiers, including:
-- Logistic Regression
-- Decision Tree
-- K-Nearest Neighbors (KNN)
-- Gaussian Naive Bayes
-- Support Vector Machine (SVM)
+## 2. Dataset description
 
-The best-performing model is saved in the `models/` directory and can be loaded by the app for predictions and evaluation.
+The dataset used in this project is the Dry Bean dataset from the UCI Machine Learning Repository.
 
-## Repository Structure
+- Source: UCI Machine Learning Repository
+- Total rows: 13,611
+- Number of numerical features: 16
+- Number of target classes: 7 bean classes
+- Target variable: `Class`
 
-- `BITS_ML_Assignment2.ipynb` — training notebook with data loading, preprocessing, model training, and evaluation
-- `app.py` — Streamlit application for model inference and performance assessment
-- `test_data.csv` — sample test dataset containing features and labels
-- `models/` — saved trained models and feature metadata
-- `requirements.txt` — Python dependencies for the project
+The dataset contains shape and size descriptors extracted from bean images, including features such as area, perimeter, major/minor axis lengths, shape factors, compactness, aspect ratio, and eccentricity.
 
-## Dataset
+## 3. GitHub repository link
 
-The project uses the Dry Bean dataset from UCI (`ucimlrepo`), which includes features such as:
-- Area
-- Perimeter
-- MajorAxisLength
-- MinorAxisLength
-- AspectRatio
-- Eccentricity
-- ConvexArea
-- EquivDiameter
-- Extent
-- Solidity
-- Roundness
-- Compactness
-- ShapeFactor1-4
+Repository: https://github.com/krishanmurari/BITS-ML-Assignment2-DryBean
 
-The target column is `Class`, which contains the bean category labels.
+## 4. Model comparison table
 
-## Setup
+| Model | Accuracy | AUC | Precision | Recall | F1 | MCC |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.9207 | 0.9934 | 0.9215 | 0.9207 | 0.9209 | 0.9042 |
+| Decision Tree | 0.8917 | 0.9330 | 0.8912 | 0.8917 | 0.8913 | 0.8691 |
+| KNN | 0.9166 | 0.9812 | 0.9174 | 0.9166 | 0.9168 | 0.8992 |
+| Gaussian Naive Bayes | 0.8979 | 0.9902 | 0.9007 | 0.8979 | 0.8981 | 0.8773 |
+| SVM | 0.9221 | 0.9937 | 0.9224 | 0.9221 | 0.9222 | 0.9059 |
 
-1. Clone the repository.
-2. Create a virtual environment (optional but recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # Linux/macOS
-   venv\Scripts\activate      # Windows
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## 5. Observations for all five models
 
-## Run the Notebook
+### Logistic Regression
+- Achieved strong overall performance with high accuracy and AUC.
+- Good balance between precision and recall, indicating stable classification across bean classes.
+- Suitable as a fast and interpretable benchmark model.
 
-Open the Jupyter notebook:
+### Decision Tree
+- Performed the weakest among all models.
+- Lower AUC and MCC indicate weaker discrimination across classes compared to the other classifiers.
+- Simpler and more interpretable but less robust for this dataset.
+
+### KNN
+- Delivered competitive performance, with accuracy close to the top models.
+- Slightly below Logistic Regression and SVM in AUC and F1.
+- Effective for local pattern recognition but may be less scalable for larger datasets.
+
+### Gaussian Naive Bayes
+- Showed decent performance with a very high AUC, suggesting good ranking ability.
+- Accuracy and MCC were lower than Logistic Regression and SVM.
+- Works well as a lightweight probabilistic baseline but is less precise than stronger classifiers.
+
+### SVM
+- Produced the best results overall across the evaluation metrics.
+- Highest accuracy, AUC, F1, and MCC among all models.
+- Best balance of precision and recall, making it the strongest choice for this classification task.
+
+## 6. Overall winner
+
+The overall winner is the Support Vector Machine (SVM) model.
+
+It achieved the highest:
+- Accuracy: 0.9221
+- AUC: 0.9937
+- F1 Score: 0.9222
+- MCC: 0.9059
+
+This makes SVM the best-performing classifier in this project based on the reported evaluation metrics.
+
+## 7. Instructions to run the application
+
+### Prerequisites
+
+- Python 3.10+
+- pip
+
+### Clone the repository
 
 ```bash
-jupyter notebook BITS_ML_Assignment2.ipynb
+git clone https://github.com/krishanmurari/BITS-ML-Assignment2-DryBean.git
+cd BITS-ML-Assignment2-DryBean
 ```
 
-This notebook performs:
-- dataset download and preprocessing
-- train/test splitting
-- model training
-- saved model generation
-- evaluation metrics and confusion matrix analysis
+### Install dependencies
 
-## Run the Streamlit App
+```bash
+pip install -r requirements.txt
+```
 
-Start the application with:
+### Launch the Streamlit app
 
 ```bash
 streamlit run app.py
 ```
 
-Then in the browser:
-- select a trained model from the sidebar,
-- upload a CSV file containing the required features,
-- view predictions,
-- download the prediction output,
-- inspect evaluation metrics if the uploaded file includes the `Class` column.
+### Use the app
 
-## Notes
+1. Select the model from the sidebar.
+2. Upload a CSV file containing the same feature columns used during training.
+3. View predictions for the uploaded dataset.
+4. If the CSV includes the `Class` column, the app will display evaluation metrics, confusion matrix, and classification report.
+5. Download the prediction results as a CSV file.
 
-- The app expects the uploaded CSV to contain the same feature columns as the training data.
-- Feature names are stored in `models/feature_names.json` to keep the input order consistent.
-- Model files in `models/` are saved using `joblib` for reuse in the app.
+## Additional notes
 
-## Requirements
-
-The project depends on:
-- Python 3.10+
-- Streamlit
-- scikit-learn
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- joblib
-- ucimlrepo
-
-## License
-
-This project is intended for academic coursework and learning purposes.
+- The feature names are stored in `models/feature_names.json` to preserve the same input order used while training.
+- The trained model files are stored in the `models/` directory and are loaded by the Streamlit dashboard.
+- The project is intended for academic use and demonstrates a complete machine learning workflow from data collection to model evaluation.
